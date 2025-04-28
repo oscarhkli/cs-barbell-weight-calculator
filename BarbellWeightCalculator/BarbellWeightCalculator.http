@@ -1,0 +1,6 @@
+@BarbellWeightCalculator_HostAddress = http://localhost:5175
+
+GET {{BarbellWeightCalculator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
