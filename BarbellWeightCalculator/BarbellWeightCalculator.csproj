@@ -8,7 +8,12 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0-preview.3.25171.5" />
         <PackageReference Include="NSwag.AspNetCore" Version="14.3.0" />
+
+        <!-- Allow Moq to access internal methods via the proxy generator -->
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+        <InternalsVisibleTo Include="BarbellWeightCalculator.Tests" />
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarbellWeightCalculator", "BarbellWeightCalculator\BarbellWeightCalculator.csproj", "{4C6684CC-D91B-4D21-BE56-1F42E59D5B6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarbellWeightCalculatorTests", "BarbellWeightCalculatorTests\BarbellWeightCalculatorTests.csproj", "{C7699E0B-5935-4732-9FFB-7052F867B111}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarbellWeightCalculator.Tests", "BarbellWeightCalculator.Tests\BarbellWeightCalculator.Tests.csproj", "{C7699E0B-5935-4732-9FFB-7052F867B111}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
