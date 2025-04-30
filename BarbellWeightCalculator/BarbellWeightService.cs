@@ -38,10 +38,53 @@ public class BarbellWeightService
         return results;
     }
 
-    internal virtual Dictionary<int, int> GetScaledSidePlates(int[] plates, int requiredWeight)
+    internal virtual Dictionary<int, int> GetScaledSidePlates(int[] plates, int sideWeight)
     {
         // Coin Change      
+        var dp = new int[sideWeight + 1];
+        var prev = new int[sideWeight + 1];
+        Array.Fill(dp, Int32.MaxValue);
+        dp[0] = 0;
+        Array.Fill(prev, -1);
         
-        return new Dictionary<int, int>();
+        for (var i = 1; i <= sideWeight; i++)
+        {
+            foreach (var plate in plates)
+            {
+                if (plate > i || dp[i - plate] == Int32.MaxValue)
+                {
+                    continue;
+                }
+
+                if (dp[i - plate] + 1 < dp[i])
+                {
+                    dp[i] = dp[i - plate] + 1;
+                    prev[i] = plate;
+                }
+                
+            }
+        }
+
+        if (dp[sideWeight] == -1)
+        {
+            return new Dictionary<int, int>();
+        }
+        
+        var curr = sideWeight;
+        var usage = new Dictionary<int, int>();
+        while (curr > 0)
+        {
+            var plate = prev[curr];
+            if (usage.TryGetValue(plate, out var val))
+            {
+                usage[plate] = val + 1;
+            }
+            else
+            {
+                usage[plate] = 1;
+            }
+            curr -= plate;
+        }
+        return usage;
     }
 }
