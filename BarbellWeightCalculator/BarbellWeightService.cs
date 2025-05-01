@@ -19,6 +19,12 @@ public class BarbellWeightService
         }
         
         var minPlate = Plates.Min();
+        if (requiredSideWeight < minPlate)
+        {
+            throw new ArgumentException("requiredSideWeight must be greater than or equal to minPlate");
+        }
+        
+        // To avoid handling double, scale all the number with the minPlate
         var scale = 1 / minPlate;
         var scaledPlates = new int[Plates.Length];
         for (var i = 0; i < Plates.Length; i++)
@@ -47,25 +53,25 @@ public class BarbellWeightService
         dp[0] = 0;
         Array.Fill(prev, -1);
         
-        for (var i = 1; i <= sideWeight; i++)
+        for (var weight = 1; weight <= sideWeight; weight++)
         {
             foreach (var plate in plates)
             {
-                if (plate > i || dp[i - plate] == Int32.MaxValue)
+                if (plate > weight || dp[weight - plate] == Int32.MaxValue)
                 {
                     continue;
                 }
 
-                if (dp[i - plate] + 1 < dp[i])
+                if (dp[weight - plate] + 1 < dp[weight])
                 {
-                    dp[i] = dp[i - plate] + 1;
-                    prev[i] = plate;
+                    dp[weight] = dp[weight - plate] + 1;
+                    prev[weight] = plate;
                 }
                 
             }
         }
-
-        if (dp[sideWeight] == -1)
+        
+        if (dp[sideWeight] == Int32.MaxValue)
         {
             return new Dictionary<int, int>();
         }

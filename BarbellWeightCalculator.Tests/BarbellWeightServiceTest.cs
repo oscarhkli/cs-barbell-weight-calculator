@@ -41,7 +41,7 @@ public class BarbellWeightServiceTest
 
     [Test(Description =
         "Given requiredWeight and barWeight, When GetWeight, Then can get correct side plates")]
-    public void ShouldGetSidePlates()
+    public void ShouldGetSidePlatesByScaledPlates()
     {
         var sBarbellWeightService = new Mock<BarbellWeightService>() { CallBase = true };
 
@@ -62,6 +62,80 @@ public class BarbellWeightServiceTest
         Assert.That(actual[2.5], Is.EqualTo(1));
     }
 
+    private static IEnumerable<TestCaseData> InvalidWeightCases()
+    {
+        yield return new TestCaseData(
+                10,
+                20,
+                typeof(ArgumentException),
+                "requiredWeight must be greater than or equal to barWeight")
+            .SetName("ShouldThrow_WhenRequiredSideWeightIsLessThanMinPlate");
+
+        yield return new TestCaseData(
+                21.5,
+                20,
+                typeof(ArgumentException),
+                "requiredSideWeight must be greater than or equal to minPlate")
+            .SetName("ShouldThrow_WhenRequiredSideWeightIsLessThanMinPlate");
+    }
+
+    [TestCaseSource(nameof(InvalidWeightCases))]
+    public void ShouldThrowForInvalidWeight(double totalWeight, int barWeight,
+        Type expectedException, string expectedMessage)
+    {
+        var barbellWeightService = new BarbellWeightService();
+
+        Assert.That(() => barbellWeightService.GetSidePlates(totalWeight, barWeight),
+            Throws.TypeOf(expectedException)
+                .With.Message
+                .Contain(expectedMessage));
+    }
+
+    private static IEnumerable<TestCaseData> SidePlatesCases()
+    {
+        yield return new TestCaseData(
+            20,
+            20,
+            new Dictionary<double, int>()).SetName("ShouldGetSidePlates_WithWeight20_BarWeight20");
+
+        yield return new TestCaseData(
+            50,
+            20,
+            new Dictionary<double, int>
+            {
+                { 5, 1 },
+                { 10, 1 }
+            }
+        ).SetName("ShouldGetSidePlates_WithWeight50_BarWeight50");
+
+        yield return new TestCaseData(
+            127.5,
+            20,
+            new Dictionary<double, int>
+            {
+                { 1.25, 1 },
+                { 2.5, 1 },
+                { 25, 2 }
+            }
+        ).SetName("ShouldGetSidePlates_WithWeight107.5_BarWeight10");
+    }
+
+    [TestCaseSource(nameof(SidePlatesCases))]
+    public void ShouldGetSidePlates(double totalWeight, int barWeight,
+        Dictionary<double, int> expected)
+    {
+        var barbellWeightService = new BarbellWeightService();
+
+        var actual = barbellWeightService.GetSidePlates(totalWeight, barWeight);
+
+        Assert.That(actual, Is.EqualTo(expected),
+            $"Expected {FormatDictDouble(expected)}\nActual: {FormatDictDouble(actual)}");
+    }
+
+    private static string FormatDictDouble(Dictionary<double, int> dict)
+    {
+        return string.Join(", ", dict.Select(kv => $"{kv.Key}:{kv.Value}"));
+    }
 
     private static IEnumerable<TestCaseData> ScaledSidePlatesCases()
     {
@@ -69,7 +143,7 @@ public class BarbellWeightServiceTest
             new[] { 1, 2, 4, 8, 16, 20 },
             2,
             new Dictionary<int, int> { { 2, 1 } }
-        ).SetName("ShouldGetSidePlates_WithWeight2");
+        ).SetName("ShouldGetScaledSidePlates_WithWeight2");
 
         yield return new TestCaseData(
             new[] { 1, 2, 4, 8, 16, 20 },
@@ -80,16 +154,35 @@ public class BarbellWeightServiceTest
                 { 8, 1 },
                 { 2, 1 }
             }
-        ).SetName("ShouldGetSidePlates_WithWeight50");
+        ).SetName("ShouldGetScaledSidePlates_WithWeight50");
+
+        yield return new TestCaseData(
+            new[] { 3, 4, 5, 15, 20 },
+            37,
+            new Dictionary<int, int> { { 3, 1 }, { 4, 1 }, { 15, 2 } }
+        ).SetName("ShouldGetScaledSidePlates_WithWeight37");
+
+        yield return new TestCaseData(
+            new[] { 3, 4, 5, 15, 20 },
+            2,
+            new Dictionary<int, int>()
+        ).SetName("ShouldGetScaledSidePlates_WithWeightImpossible");
     }
 
     [TestCaseSource(nameof(ScaledSidePlatesCases))]
-    public void ShouldGetScaledSidePlates(int[] plates, int sideWeight, Dictionary<int, int> expected)
+    public void ShouldGetScaledSidePlates(int[] plates, int sideWeight,
+        Dictionary<int, int> expected)
     {
         var barbellWeightService = new BarbellWeightService();
 
         var actual = barbellWeightService.GetScaledSidePlates(plates, sideWeight);
 
-        Assert.That(actual, Is.EqualTo(expected));
+        Assert.That(actual, Is.EqualTo(expected),
+            $"Expected {FormatDictInt(expected)}\nActual: {FormatDictInt(actual)}");
+    }
+
+    private static string FormatDictInt(Dictionary<int, int> dict)
+    {
+        return string.Join(", ", dict.Select(kv => $"{kv.Key}:{kv.Value}"));
     }
 }
